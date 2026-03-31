@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EthAISyn SENTINEL — Cognitive Compliance Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF6F1;
+  --cream-dark: #F0EBE3;
+  --ink: #1A1714;
+  --ink-light: #3D3832;
+  --ink-muted: #8A8279;
+  --brown: #7B5B45;
+  --brown-dark: #5A3F2E;
+  --brown-light: #9B7B62;
+  --mocha: #3E3530;
+  --mocha-light: #4D4340;
+  --mocha-border: #5A4F4A;
+  --mocha-text: #C4BAB0;
+  --red: #C0392B;
+  --red-bg: #FDECEA;
+  --green: #27AE60;
+  --green-bg: #E8F8F0;
+  --amber: #C8873B;
+  --blue: #2C7BE5;
+  --white: #FFFFFF;
+  --border: #E2DDD6;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Source Sans 3', -apple-system, sans-serif;
+  background: var(--cream); color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* NAV */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250,246,241,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 58px;
+}
+.nav-brand { display: flex; align-items: baseline; gap: 10px; }
+.nav-prefix {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--ink-muted); font-weight: 500;
+}
+.nav-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 21px; color: var(--ink); letter-spacing: 2px;
+}
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-links a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--ink-muted); text-decoration: none; font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--ink); }
+.btn-nav {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase;
+  background: var(--brown); color: var(--cream);
+  padding: 10px 18px; border: none; cursor: pointer; font-weight: 600;
+  transition: background 0.2s;
+}
+.btn-nav:hover { background: var(--brown-dark); }
+
+/* HERO */
+.hero {
+  padding: 72px 48px 88px;
+  display: grid; grid-template-columns: 1fr 480px;
+  gap: 48px; max-width: 1340px; margin: 0 auto;
+  align-items: start;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--ink-muted); border: 1px solid var(--border);
+  padding: 7px 14px; margin-bottom: 32px;
+}
+.dot-green {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 62px; line-height: 1.06; color: var(--ink);
+  margin-bottom: 24px; letter-spacing: -0.5px; max-width: 600px;
+}
+.hero-rule { width: 56px; height: 2.5px; background: var(--brown); margin-bottom: 22px; }
+.hero-body {
+  font-size: 17.5px; line-height: 1.7; color: var(--ink-light);
+  max-width: 480px; margin-bottom: 36px; font-weight: 300;
+}
+.hero-btns { display: flex; gap: 10px; }
+.btn-brown {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase;
+  background: var(--brown); color: var(--cream);
+  padding: 14px 22px; border: none; cursor: pointer; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s;
+}
+.btn-brown:hover { background: var(--brown-dark); }
+.btn-outline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase;
+  background: transparent; color: var(--ink);
+  padding: 14px 22px; border: 1.5px solid var(--border);
+  cursor: pointer; font-weight: 500; transition: border-color 0.2s;
+}
+.btn-outline:hover { border-color: var(--ink); }
+
+/* MONITOR WIDGET */
+.widget {
+  background: var(--white); border: 1px solid var(--border);
+  box-shadow: 0 16px 48px rgba(26,23,20,0.1);
+}
+.widget-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 13px 18px; border-bottom: 1px solid var(--border);
+}
+.widget-head-l {
+  display: flex; align-items: center; gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--ink); font-weight: 600;
+}
+.dot-amber {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--amber); animation: pulse 2s infinite;
+}
+.widget-head-r {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; color: var(--ink-muted);
+}
+.widget-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+.w-stat { padding: 14px 18px; border-right: 1px solid var(--border); }
+.w-stat:last-child { border-right: none; }
+.w-stat-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px; line-height: 1; margin-bottom: 3px;
+}
+.w-stat-val.red { color: var(--red); }
+.w-stat-val.brown { color: var(--brown); }
+.w-stat-val.green { color: var(--green); }
+.w-stat-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.w-row {
+  display: grid; grid-template-columns: 22px 1fr auto;
+  gap: 10px; align-items: center;
+  padding: 10px 18px; border-bottom: 1px solid var(--border);
+}
+.w-row:last-of-type { border-bottom: none; }
+.w-row.flagged { background: rgba(192,57,43,0.025); }
+.w-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700;
+}
+.w-icon.fl { background: var(--red-bg); color: var(--red); }
+.w-icon.ok { background: var(--green-bg); color: var(--green); }
+.w-icon.esc { background: var(--cream-dark); color: var(--ink-muted); }
+.w-case-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--ink-muted);
+}
+.w-flag-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5px; letter-spacing: 1px; text-transform: uppercase;
+  background: var(--red); color: #fff; padding: 1.5px 5px;
+  margin-left: 5px; font-weight: 700;
+}
+.w-case-name { font-size: 13px; font-weight: 500; }
+.w-meta { text-align: right; }
+.w-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; }
+.w-time.red { color: var(--red); }
+.w-status {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase;
+}
+.w-status.acc { color: var(--red); }
+.w-status.mod { color: var(--green); }
+.w-status.esc { color: var(--blue); }
+.widget-foot {
+  padding: 11px 18px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--ink-muted);
+}
+.widget-foot a { color: var(--brown); text-decoration: none; font-weight: 600; }
+.widget-foot a:hover { text-decoration: underline; }
+
+/* SECTION BREAK */
+.section-break {
+  border: none; border-top: 1px solid var(--border);
+  margin: 0 48px; max-width: 1244px;
+}
+
+/* PROBLEM */
+.problem {
+  padding: 96px 48px;
+  display: grid; grid-template-columns: 1fr 440px;
+  gap: 64px; max-width: 1340px; margin: 0 auto;
+}
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--ink-muted); margin-bottom: 20px;
+}
+.problem h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 52px; line-height: 1.08; margin-bottom: 28px; max-width: 520px;
+}
+.problem-body {
+  font-size: 16.5px; line-height: 1.72; color: var(--ink-light);
+  margin-bottom: 20px; max-width: 480px; font-weight: 300;
+}
+.problem-quote {
+  border-left: 3px solid var(--brown);
+  padding: 16px 20px; margin-top: 28px;
+}
+.problem-quote p {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; line-height: 1.4; color: var(--ink); margin-bottom: 6px;
+}
+.problem-quote .attr { font-size: 13px; color: var(--ink-muted); }
+
+/* WORKFLOW */
+.wf-step {
+  display: grid; grid-template-columns: 40px 1fr;
+  gap: 16px; padding: 20px 24px;
+  background: var(--white); border: 1px solid var(--border); border-bottom: none;
+}
+.wf-step:last-child { border-bottom: 1px solid var(--border); }
+.wf-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cream-dark); color: var(--ink-muted);
+}
+.wf-step.highlight .wf-num { background: var(--brown); color: var(--cream); }
+.wf-title { font-family: 'DM Serif Display', serif; font-size: 17px; margin-bottom: 2px; }
+.wf-sub { font-size: 13.5px; color: var(--ink-muted); line-height: 1.5; }
+.wf-questions { margin-top: 8px; padding-left: 0; list-style: none; }
+.wf-questions li {
+  font-size: 13px; color: var(--ink-muted); line-height: 1.6;
+  padding-left: 14px; position: relative;
+}
+.wf-questions li::before {
+  content: '•'; position: absolute; left: 0; color: var(--brown);
+}
+.sentinel-answer { background: var(--mocha); padding: 24px 28px; }
+.sentinel-answer .sa-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 10px;
+}
+.sentinel-answer p {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; line-height: 1.35; color: var(--cream);
+}
+
+/* METRICS DARK BAND */
+.metrics-band { background: var(--mocha); padding: 96px 48px; }
+.metrics-inner { max-width: 1340px; margin: 0 auto; }
+.metrics-head {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 64px; margin-bottom: 56px;
+}
+.metrics-head h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px; line-height: 1.1; color: var(--cream);
+}
+.metrics-head-right {
+  font-size: 16px; line-height: 1.7; color: var(--mocha-text);
+  padding-top: 20px; font-weight: 300; font-style: italic;
+}
+.metric-row {
+  display: grid; grid-template-columns: 1fr 380px;
+  gap: 48px; border-top: 1px solid var(--mocha-border);
+  padding: 36px 0; align-items: start;
+}
+.metric-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px; color: var(--mocha-text); margin-bottom: 4px;
+}
+.metric-number {
+  font-family: 'DM Serif Display', serif;
+  font-size: 44px; color: rgba(250,246,241,0.08); line-height: 1; margin-bottom: 8px;
+}
+.metric-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; color: var(--cream); margin-bottom: 10px;
+}
+.metric-desc {
+  font-size: 14.5px; line-height: 1.65; color: var(--mocha-text);
+  max-width: 480px; margin-bottom: 16px;
+}
+.metric-flag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--cream); background: rgba(200,135,59,0.2);
+  padding: 5px 12px; font-weight: 600;
+}
+.metric-flag .mf-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: var(--amber);
+}
+.metric-example-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--mocha-text); margin-bottom: 10px;
+}
+.metric-example-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px; line-height: 1.45; color: var(--cream); font-style: italic;
+}
+
+/* ENGAGEMENT */
+.engagement { padding: 96px 48px; max-width: 1340px; margin: 0 auto; }
+.engage-top {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 64px; margin-bottom: 16px;
+}
+.engage-top h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px; line-height: 1.1;
+}
+.engage-top-right {
+  font-size: 16.5px; line-height: 1.65; color: var(--ink-light);
+  padding-top: 12px; font-weight: 300; font-style: italic; max-width: 420px;
+}
+.engage-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; letter-spacing: 1px; color: var(--ink-muted);
+  margin-bottom: 40px; padding: 12px 0;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.phases { display: grid; grid-template-columns: repeat(3, 1fr); }
+.phase {
+  background: var(--white); border: 1px solid var(--border);
+  padding: 32px 28px; position: relative;
+}
+.phase:not(:first-child) { border-left: none; }
+.phase:last-child { background: var(--cream-dark); }
+.phase-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border); margin-bottom: 20px;
+}
+.phase:last-child .phase-dot { background: var(--amber); }
+.phase-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-muted); margin-bottom: 8px;
+}
+.phase-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; line-height: 1.25; margin-bottom: 16px;
+}
+.phase-desc { font-size: 13.5px; line-height: 1.6; color: var(--ink-light); margin-bottom: 24px; }
+.phase-output-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-muted); margin-bottom: 6px;
+}
+.phase-output { font-size: 13px; color: var(--ink-light); font-style: italic; }
+
+/* DELIVERABLE */
+.deliverable {
+  padding: 96px 48px;
+  display: grid; grid-template-columns: 1fr 480px;
+  gap: 64px; max-width: 1340px; margin: 0 auto; align-items: start;
+}
+.deliverable h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px; line-height: 1.1; margin-bottom: 24px;
+}
+.deliverable-body {
+  font-size: 16.5px; line-height: 1.72; color: var(--ink-light);
+  margin-bottom: 20px; max-width: 460px; font-weight: 300;
+}
+.del-quote { background: var(--mocha); padding: 28px; margin-top: 12px; }
+.del-quote .dq-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 12px;
+}
+.del-quote p {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; line-height: 1.35; color: var(--cream);
+}
+
+/* REPORT PREVIEW */
+.report-preview {
+  background: var(--white); border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(26,23,20,0.08);
+}
+.rp-head {
+  background: var(--mocha); padding: 20px 24px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.rp-brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 4px;
+}
+.rp-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 17px; color: var(--cream); margin-bottom: 2px;
+}
+.rp-sub { font-size: 12px; color: var(--mocha-text); }
+.rp-icon { color: var(--mocha-text); font-size: 18px; opacity: 0.5; }
+.rp-finding { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.rp-finding-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-muted); margin-bottom: 6px;
+}
+.rp-finding-val {
+  font-family: 'DM Serif Display', serif;
+  font-size: 40px; color: var(--red); margin-bottom: 3px;
+}
+.rp-finding-desc { font-size: 13px; color: var(--ink-light); line-height: 1.4; }
+.rp-item {
+  display: grid; grid-template-columns: 28px 1fr;
+  gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--border);
+}
+.rp-item:last-of-type { border-bottom: none; }
+.rp-item-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--brown); font-weight: 600; padding-top: 2px;
+}
+.rp-item-title {
+  font-family: 'DM Serif Display', serif; font-size: 15px; margin-bottom: 2px;
+}
+.rp-item-desc { font-size: 12.5px; color: var(--ink-muted); line-height: 1.5; }
+.rp-foot {
+  padding: 12px 24px; border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-muted); text-align: center;
+}
+
+/* LEADERSHIP */
+.leadership { padding: 96px 48px; max-width: 1340px; margin: 0 auto; }
+.leadership h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px; line-height: 1.1; margin-bottom: 14px; max-width: 600px;
+}
+.leadership-intro {
+  font-size: 16.5px; line-height: 1.65; color: var(--ink-light);
+  max-width: 580px; margin-bottom: 48px; font-weight: 300;
+}
+.persona-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.persona {
+  background: var(--white); border: 1px solid var(--border); padding: 36px 32px;
+}
+.persona:nth-child(2) { border-left: none; }
+.persona:nth-child(3) { border-top: none; }
+.persona:nth-child(4) { border-top: none; border-left: none; }
+.persona-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.persona-icon { font-size: 18px; opacity: 0.6; }
+.persona-name { font-family: 'DM Serif Display', serif; font-size: 19px; }
+.persona-section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--red); margin-bottom: 8px;
+}
+.persona-section-label.provides { color: var(--brown); margin-top: 20px; }
+.persona-text { font-size: 14px; line-height: 1.6; color: var(--ink-light); }
+
+/* CTA */
+.cta {
+  padding: 96px 48px 80px;
+  display: grid; grid-template-columns: 1fr 480px;
+  gap: 64px; max-width: 1340px; margin: 0 auto; align-items: start;
+}
+.cta h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px; line-height: 1.1; margin-bottom: 20px;
+}
+.cta-body {
+  font-size: 16.5px; line-height: 1.72; color: var(--ink-light);
+  max-width: 460px; margin-bottom: 32px; font-weight: 300;
+}
+.cta-checks { list-style: none; }
+.cta-checks li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; color: var(--brown); font-weight: 500;
+  margin-bottom: 10px; font-style: italic;
+}
+.cta-checks li .ck { color: var(--ink-muted); font-size: 14px; }
+.cta-form {
+  background: var(--white); border: 1px solid var(--border); padding: 36px 32px;
+}
+.cta-form-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--ink-muted); margin-bottom: 28px; font-weight: 600;
+}
+.cta-form label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--ink-muted); display: block; margin-bottom: 6px;
+}
+.cta-form input {
+  width: 100%; padding: 13px 14px;
+  background: var(--cream); border: 1px solid var(--border);
+  color: var(--ink); font-family: 'Source Sans 3', sans-serif;
+  font-size: 15px; margin-bottom: 20px; outline: none;
+  transition: border-color 0.2s;
+}
+.cta-form input::placeholder { color: var(--ink-muted); }
+.cta-form input:focus { border-color: var(--brown); }
+.cta-form-submit {
+  width: 100%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase;
+  background: var(--cream-dark); color: var(--ink);
+  padding: 15px; border: 1px solid var(--border); cursor: pointer;
+  font-weight: 600; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.cta-form-submit:hover { background: var(--border); }
+.cta-form-note {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--ink-muted); text-align: center;
+  margin-top: 14px; font-style: italic;
+}
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border); padding: 28px 48px;
+  max-width: 1340px; margin: 0 auto;
+}
+.footer-top {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+}
+.footer-links { display: flex; gap: 24px; }
+.footer-links a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--ink-muted); text-decoration: none; font-weight: 500;
+}
+.footer-links a:hover { color: var(--ink); }
+.footer-bottom {
+  display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-muted);
+}
+.footer-bottom .tagline { font-style: italic; color: var(--brown); }
+
+/* ANIMATIONS */
+.reveal {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.d1 { transition-delay: 0.05s; }
+.d2 { transition-delay: 0.12s; }
+.d3 { transition-delay: 0.2s; }
+.d4 { transition-delay: 0.28s; }
+
+@media (max-width: 1024px) {
+  .hero, .problem, .deliverable, .cta { grid-template-columns: 1fr; }
+  .metrics-head, .engage-top { grid-template-columns: 1fr; }
+  .metric-row { grid-template-columns: 1fr; }
+  .phases { grid-template-columns: 1fr; }
+  .phase:not(:first-child) { border-left: 1px solid var(--border); border-top: none; }
+  .persona-grid { grid-template-columns: 1fr; }
+  .persona:nth-child(n) { border-left: 1px solid var(--border); border-top: none; }
+  .persona:first-child { border-top: 1px solid var(--border); }
+  nav { padding: 0 20px; }
+  .hero, .problem, .engagement, .deliverable, .leadership, .cta { padding-left: 20px; padding-right: 20px; }
+  .hero h1 { font-size: 40px; }
+  .problem h2, .deliverable h2, .leadership h2, .engage-top h2, .cta h2, .metrics-head h2 { font-size: 36px; }
+  .nav-links a { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <span class="nav-prefix">EthAISyn</span>
+    <span class="nav-name">SENTINEL</span>
+  </div>
+  <div class="nav-links">
+    <a href="#problem">Problem</a>
+    <a href="#metrics">Metrics</a>
+    <a href="#engagement">Engagement</a>
+    <a href="#leadership">Leadership</a>
+    <button class="btn-nav" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Request Briefing</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div>
+    <div class="hero-badge reveal"><span class="dot-green"></span> Human Oversight Intelligence</div>
+    <h1 class="reveal d1">AI overreliance is&nbsp;not visible until it's a&nbsp;crisis.</h1>
+    <div class="hero-rule reveal d2"></div>
+    <p class="hero-body reveal d2">Sentinel sits inside AI-assisted prior authorization workflows and measures whether the humans using those tools are actually thinking — or just clicking through.</p>
+    <div class="hero-btns reveal d3">
+      <button class="btn-brown" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Request a Leadership Briefing <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="btn-outline" onclick="document.getElementById('problem').scrollIntoView({behavior:'smooth'})">See the Problem</button>
+    </div>
+  </div>
+  <div class="widget reveal d2">
+    <div class="widget-head">
+      <div class="widget-head-l"><span class="dot-amber"></span> Sentinel · Live Monitoring</div>
+      <div class="widget-head-r">Today, 08:00–14:00</div>
+    </div>
+    <div class="widget-stats">
+      <div class="w-stat"><div class="w-stat-val red">61%</div><div class="w-stat-lbl">Rubber-Stamped</div></div>
+      <div class="w-stat"><div class="w-stat-val brown">0:38</div><div class="w-stat-lbl">Avg Review Time</div></div>
+      <div class="w-stat"><div class="w-stat-val green">1.2%</div><div class="w-stat-lbl">Override Rate</div></div>
+    </div>
+    <div class="w-row flagged">
+      <div class="w-icon fl">⚠</div>
+      <div><div class="w-case-id">PA-8841 <span class="w-flag-tag">No Review Detected</span></div><div class="w-case-name">Oncology — Chemotherapy</div></div>
+      <div class="w-meta"><div class="w-time red">0:23</div><div class="w-status acc">Accepted</div></div>
+    </div>
+    <div class="w-row">
+      <div class="w-icon ok">✓</div>
+      <div><div class="w-case-id">PA-8839</div><div class="w-case-name">Cardiology — Catheterization</div></div>
+      <div class="w-meta"><div class="w-time">4:12</div><div class="w-status mod">Modified</div></div>
+    </div>
+    <div class="w-row flagged">
+      <div class="w-icon fl">⚠</div>
+      <div><div class="w-case-id">PA-8836 <span class="w-flag-tag">No Review Detected</span></div><div class="w-case-name">Orthopedics — MRI</div></div>
+      <div class="w-meta"><div class="w-time red">0:31</div><div class="w-status acc">Accepted</div></div>
+    </div>
+    <div class="w-row flagged">
+      <div class="w-icon fl">⚠</div>
+      <div><div class="w-case-id">PA-8834 <span class="w-flag-tag">No Review Detected</span></div><div class="w-case-name">Neurology — PET Scan</div></div>
+      <div class="w-meta"><div class="w-time red">0:18</div><div class="w-status acc">Accepted</div></div>
+    </div>
+    <div class="w-row">
+      <div class="w-icon esc">↑</div>
+      <div><div class="w-case-id">PA-8830</div><div class="w-case-name">Surgery — Hip Replacement</div></div>
+      <div class="w-meta"><div class="w-time">2:47</div><div class="w-status esc">Escalated</div></div>
+    </div>
+    <div class="widget-foot">
+      <span>3 of 5 cases flagged this session</span>
+      <a href="#">View full report →</a>
+    </div>
+  </div>
+</section>
+
+<hr class="section-break">
+
+<section class="problem" id="problem">
+  <div>
+    <div class="section-tag reveal">The Problem</div>
+    <h2 class="reveal d1">The gap between recommendation and decision is where oversight dies.</h2>
+    <p class="problem-body reveal d2">Every prior authorization workflow has the same invisible moment: the AI has spoken, and a human must now do something. Nobody is watching what that something is.</p>
+    <p class="problem-body reveal d2">Your throughput metrics look fine. Your dashboard is green. But you have no idea how many of those decisions involved a human who was actually thinking — and how many involved a human who just clicked Accept.</p>
+    <div class="problem-quote reveal d3">
+      <p>"How do you know your humans are still in the loop?"</p>
+      <div class="attr">The question regulators are beginning to ask.</div>
+    </div>
+  </div>
+  <div>
+    <div class="reveal d1">
+      <div class="wf-step">
+        <div class="wf-num">01</div>
+        <div><div class="wf-title">AI generates recommendation</div><div class="wf-sub">Approve / Deny / Request more info</div></div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">02</div>
+        <div><div class="wf-title">Staff member sees the rec</div><div class="wf-sub">In the workflow UI — takes 2 seconds to load</div></div>
+      </div>
+      <div class="wf-step highlight">
+        <div class="wf-num">03</div>
+        <div>
+          <div class="wf-title">???</div>
+          <div class="wf-sub">This moment is invisible to everyone</div>
+          <ul class="wf-questions">
+            <li>Did they open the clinical record?</li>
+            <li>Did they read it?</li>
+            <li>Did they spend 20 seconds or 4 minutes?</li>
+            <li>Did they add a note, or just click through?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">04</div>
+        <div><div class="wf-title">Decision is submitted</div><div class="wf-sub">Logged, filed, and considered compliant</div></div>
+      </div>
+    </div>
+    <div class="sentinel-answer reveal d2">
+      <div class="sa-tag">Sentinel's Answer</div>
+      <p>Instrument that invisible moment. Score it. Surface it. Report&nbsp;it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="metrics-band" id="metrics">
+  <div class="metrics-inner">
+    <div class="metrics-head">
+      <div>
+        <div class="section-tag reveal" style="color:var(--amber)">Five Behavioral Metrics</div>
+        <h2 class="reveal d1">Behavioral signals, not surveys.</h2>
+      </div>
+      <div class="metrics-head-right reveal d2">Every metric is derived from observable, logged behavior — what the system captures, not what staff remembers.</div>
+    </div>
+    <div class="metric-row reveal">
+      <div>
+        <div class="metric-label">M-01</div><div class="metric-number">01</div>
+        <div class="metric-title">Time-to-Decision</div>
+        <div class="metric-desc">How long elapsed between the AI recommendation appearing and action being taken. Sub-threshold times with no accompanying documentation are the clearest behavioral signal of rubber-stamping.</div>
+        <div class="metric-flag"><span class="mf-dot"></span> Flag Condition: &lt; 40 seconds + no notes</div>
+      </div>
+      <div>
+        <div class="metric-example-label">Field Example</div>
+        <div class="metric-example-text">"Staff accepted a chemotherapy authorization in 23 seconds with no record access."</div>
+      </div>
+    </div>
+    <div class="metric-row reveal">
+      <div>
+        <div class="metric-label">M-02</div><div class="metric-number">02</div>
+        <div class="metric-title">Documentation Behavior</div>
+        <div class="metric-desc">Did the staff member add clinical notes, modify the recommendation, or annotate the decision? Documentation is the trace of active engagement. Its absence is the trace of passive click-through.</div>
+        <div class="metric-flag"><span class="mf-dot"></span> Flag Condition: Zero added notes on accepted rec</div>
+      </div>
+      <div>
+        <div class="metric-example-label">Field Example</div>
+        <div class="metric-example-text">"61% of accepted AI recommendations had no documentation added during the review session."</div>
+      </div>
+    </div>
+    <div class="metric-row reveal">
+      <div>
+        <div class="metric-label">M-03</div><div class="metric-number">03</div>
+        <div class="metric-title">Override Rate by Case Type</div>
+        <div class="metric-desc">A near-zero override rate on a specific case category is a warning, not a metric. Sentinel disaggregates override behavior across case types to surface the ones that have been quietly automated.</div>
+        <div class="metric-flag"><span class="mf-dot"></span> Flag Condition: Override rate &lt; 2% on any case type</div>
+      </div>
+      <div>
+        <div class="metric-example-label">Field Example</div>
+        <div class="metric-example-text">"Oncology prior auths had a 0.8% override rate over six weeks. The AI was effectively deciding."</div>
+      </div>
+    </div>
+    <div class="metric-row reveal">
+      <div>
+        <div class="metric-label">M-04</div><div class="metric-number">04</div>
+        <div class="metric-title">Escalation Behavior</div>
+        <div class="metric-desc">For cases that historically required physician review, did staff escalate? Absent escalation on known-complex cases is a direct signal that the human judgment layer has collapsed.</div>
+        <div class="metric-flag"><span class="mf-dot"></span> Flag Condition: No escalation on ambiguous case types</div>
+      </div>
+      <div>
+        <div class="metric-example-label">Field Example</div>
+        <div class="metric-example-text">"Zero escalations were recorded for dual-criteria denial cases across the measurement period."</div>
+      </div>
+    </div>
+    <div class="metric-row reveal">
+      <div>
+        <div class="metric-label">M-05</div><div class="metric-number">05</div>
+        <div class="metric-title">Verification Activity</div>
+        <div class="metric-desc">Did the staff member open the clinical record, payer policy, or prior authorization history before acting? Click-through data captures whether verification happened or was skipped entirely.</div>
+        <div class="metric-flag"><span class="mf-dot"></span> Flag Condition: No record access before acceptance</div>
+      </div>
+      <div>
+        <div class="metric-example-label">Field Example</div>
+        <div class="metric-example-text">"In 44% of approved cases, the underlying clinical record was never accessed."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="engagement" id="engagement">
+  <div class="engage-top">
+    <div>
+      <div class="section-tag reveal">The Engagement</div>
+      <h2 class="reveal d1">Six weeks.<br>One workflow.<br>One baseline.</h2>
+    </div>
+    <div class="engage-top-right reveal d2">This is a service engagement, not a software deployment. No year-long implementation. No platform negotiation. No IT project.</div>
+  </div>
+  <div class="engage-subtitle reveal d2">We scope narrow by design. One workflow, one team, one answer.</div>
+  <div class="phases">
+    <div class="phase reveal d1">
+      <div class="phase-dot"></div>
+      <div class="phase-time">Weeks 1–2</div>
+      <div class="phase-title">Scoping &amp; Instrumentation</div>
+      <div class="phase-desc">Define the single workflow and team. Map every AI recommendation touchpoint. Configure behavioral logging against the five metrics. Establish baseline case volume.</div>
+      <div class="phase-output-label">Output</div>
+      <div class="phase-output">Instrumented workflow, defined measurement period</div>
+    </div>
+    <div class="phase reveal d2">
+      <div class="phase-dot"></div>
+      <div class="phase-time">Weeks 3–5</div>
+      <div class="phase-title">Active Measurement</div>
+      <div class="phase-desc">Capture behavioral signals across live cases. Score each case in real time against all five metrics. Flag cases where judgment signals are absent or insufficient.</div>
+      <div class="phase-output-label">Output</div>
+      <div class="phase-output">Scored case log, flagged case registry, variance analysis</div>
+    </div>
+    <div class="phase reveal d3">
+      <div class="phase-dot"></div>
+      <div class="phase-time">Week 6</div>
+      <div class="phase-title">Report &amp; Readout</div>
+      <div class="phase-desc">Deliver the structured baseline document. Present findings to compliance, legal, and operations leadership. Identify the specific case types requiring intervention.</div>
+      <div class="phase-output-label">Output</div>
+      <div class="phase-output">The baseline report. The number. The evidence.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-break">
+
+<section class="deliverable">
+  <div>
+    <div class="section-tag reveal">The Deliverable</div>
+    <h2 class="reveal d1">The baseline report is the product.</h2>
+    <p class="deliverable-body reveal d2">At the end of six weeks, you receive a structured document. Not a live dashboard. Not a platform subscription. A report — with a number at the top that your leadership will quote for the next two years.</p>
+    <p class="deliverable-body reveal d2">It is the artifact that makes every subsequent conversation with a regulator, auditor, board member, or payer easier. It is evidence that the question of human oversight was asked before it was demanded.</p>
+    <div class="del-quote reveal d3">
+      <div class="dq-tag">The Sentence That Matters</div>
+      <p>"We measured it. Here is what we found. Here is what we did about it."</p>
+    </div>
+  </div>
+  <div class="report-preview reveal d2">
+    <div class="rp-head">
+      <div>
+        <div class="rp-brand">EthAISyn Sentinel</div>
+        <div class="rp-title">Human Oversight Baseline Report</div>
+        <div class="rp-sub">Prior Authorization — Q1 Measurement Period</div>
+      </div>
+      <div class="rp-icon">📄</div>
+    </div>
+    <div class="rp-finding">
+      <div class="rp-finding-label">Primary Finding</div>
+      <div class="rp-finding-val">61%</div>
+      <div class="rp-finding-desc">of AI recommendations accepted without sufficient human review</div>
+    </div>
+    <div class="rp-item"><div class="rp-item-num">01</div><div><div class="rp-item-title">The Baseline Number</div><div class="rp-item-desc">Percentage of AI recommendations accepted without meaningful review, broken down by case type, shift, and staff cohort.</div></div></div>
+    <div class="rp-item"><div class="rp-item-num">02</div><div><div class="rp-item-title">Flagged Cases Registry</div><div class="rp-item-desc">The specific cases — not anonymized aggregates — where behavioral signals indicate judgment was absent or insufficient.</div></div></div>
+    <div class="rp-item"><div class="rp-item-num">03</div><div><div class="rp-item-title">Metric-by-Metric Scores</div><div class="rp-item-desc">A scored view of all five metrics across the engagement period. Where the workflow holds. Where it does not.</div></div></div>
+    <div class="rp-item"><div class="rp-item-num">04</div><div><div class="rp-item-title">Variance Analysis</div><div class="rp-item-desc">Case-type and staff-cohort variance that only appears when behavior is measured, not when outcomes are counted.</div></div></div>
+    <div class="rp-item"><div class="rp-item-num">05</div><div><div class="rp-item-title">Regulatory Documentation</div><div class="rp-item-desc">A structured narrative written so compliance and legal can reference it directly when regulators ask for proof.</div></div></div>
+    <div class="rp-foot">Prepared for Compliance, Legal &amp; Operations Leadership</div>
+  </div>
+</section>
+
+<hr class="section-break">
+
+<section class="leadership" id="leadership">
+  <div class="section-tag reveal">Built For</div>
+  <h2 class="reveal d1">The people responsible when something goes wrong.</h2>
+  <p class="leadership-intro reveal d2">Sentinel is a governance and risk instrument. The audience is not operations — it's the people who carry accountability.</p>
+  <div class="persona-grid">
+    <div class="persona reveal d1">
+      <div class="persona-header"><span class="persona-icon">🛡</span><span class="persona-name">Chief Compliance Officer</span></div>
+      <div class="persona-section-label">The Exposure</div>
+      <p class="persona-text">Regulators are asking about AI governance. You need documentation that human oversight is real and auditable — not just stated policy.</p>
+      <div class="persona-section-label provides">What Sentinel Provides</div>
+      <p class="persona-text">Sentinel gives you a measured, documented baseline you can point to when the question becomes a requirement.</p>
+    </div>
+    <div class="persona reveal d2">
+      <div class="persona-header"><span class="persona-icon">⚖</span><span class="persona-name">General Counsel</span></div>
+      <div class="persona-section-label">The Exposure</div>
+      <p class="persona-text">If an AI-assisted denial is challenged, you need to show that a human exercised genuine judgment. Right now you cannot.</p>
+      <div class="persona-section-label provides">What Sentinel Provides</div>
+      <p class="persona-text">The flagged-case data and behavioral record provide the evidentiary foundation that 'decision-support tool' claims legally require.</p>
+    </div>
+    <div class="persona reveal d3">
+      <div class="persona-header"><span class="persona-icon">📈</span><span class="persona-name">VP Operations / Revenue Cycle</span></div>
+      <div class="persona-section-label">The Exposure</div>
+      <p class="persona-text">You bought an AI copilot. Throughput is up. But efficiency gains and oversight quality are two different questions.</p>
+      <div class="persona-section-label provides">What Sentinel Provides</div>
+      <p class="persona-text">Quantified evidence of where speed gains come at the cost of genuine human judgment — and where they don't.</p>
+    </div>
+    <div class="persona reveal d4">
+      <div class="persona-header"><span class="persona-icon">🩺</span><span class="persona-name">Chief Medical Officer</span></div>
+      <div class="persona-section-label">The Exposure</div>
+      <p class="persona-text">Clinical appropriateness decisions are being touched by AI. You are accountable if the standard of care is compromised by automation bias.</p>
+      <div class="persona-section-label provides">What Sentinel Provides</div>
+      <p class="persona-text">Case-level visibility into whether clinical review is happening — with the data to intervene before a patient outcome makes it visible.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-break">
+
+<section class="cta" id="cta">
+  <div>
+    <div class="section-tag reveal">Get Started</div>
+    <h2 class="reveal d1">Request a leadership briefing.</h2>
+    <p class="cta-body reveal d2">A 45-minute call with your compliance, legal, or operations leadership to walk through the Sentinel framework, scope a potential engagement, and determine whether measurement is warranted — before it is required.</p>
+    <ul class="cta-checks reveal d3">
+      <li><span class="ck">⊙</span> No software to purchase or deploy</li>
+      <li><span class="ck">⊙</span> Scoped to one workflow, one team</li>
+      <li><span class="ck">⊙</span> Deliverable in six weeks</li>
+      <li><span class="ck">⊙</span> Built for compliance and legal audiences</li>
+    </ul>
+  </div>
+  <div class="cta-form reveal d2">
+    <div class="cta-form-title">Request a Briefing</div>
+    <label for="email">Work Email</label>
+    <input type="email" id="email" placeholder="you@healthsystem.org">
+    <label for="org">Organization</label>
+    <input type="text" id="org" placeholder="Health system or payer name">
+    <button class="cta-form-submit">Request Briefing → </button>
+    <div class="cta-form-note">No sales sequence. No automated drip. A human will respond.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div class="nav-brand"><span class="nav-prefix">EthAISyn</span><span class="nav-name">SENTINEL</span></div>
+    <div class="footer-links">
+      <a href="#problem">The Problem</a>
+      <a href="#metrics">Five Metrics</a>
+      <a href="#engagement">The Engagement</a>
+      <a href="#leadership">Leadership</a>
+      <a href="#cta">Request Briefing</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 EthAISyn. All rights reserved.</span>
+    <span class="tagline">Making AI overreliance visible before it becomes a crisis.</span>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
